@@ -1,0 +1,143 @@
+<build>
+		<plugins>
+			<!-- mixed scala/java compile -->
+			<plugin>
+				<groupId>org.scala-tools</groupId>
+				<artifactId>maven-scala-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>compile</id>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<phase>compile</phase>
+					</execution>
+					<execution>
+						<id>test-compile</id>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+						<phase>test-compile</phase>
+					</execution>
+					<execution>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<!-- for fatjar -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>assemble-all</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>fully.qualified.MainClass</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.scala-tools</groupId>
+										<artifactId>
+											maven-scala-plugin
+										</artifactId>
+										<versionRange>
+											[2.15.2,)
+										</versionRange>
+										<goals>
+											<goal>compile</goal>
+											<goal>testCompile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute></execute>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	
+	
+	
+	
+	package com.cloudwick.streaming.spark
+
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
+
+import org.apache.spark.SparkConf
+import org.apache.spark.streaming._
+import org.apache.spark.streaming.kafka._
+import org.apache.spark.streaming.Seconds
+
+class TestConsumer {
+  def main(args: Array[String]) {
+    if (args.length < 4) {
+      System.err.println("Usage: KafkaWordCount <zkQuorum> <group> <topics> <numThreads>")
+      System.exit(1)
+    }
+
+    StreamingExamples.setStreamingLogLevels()
+
+    val Array(zkQuorum, group, topics, numThreads) = args
+    val sparkConf = new SparkConf().setAppName("KafkaWordCount")
+    val ssc = new StreamingContext(sparkConf, Seconds(2))
+    ssc.checkpoint("checkpoint")
+
+    val topicMap = topics.split(",").map((_, numThreads.toInt)).toMap
+    val lines = KafkaUtils.createStream(ssc, zkQuorum, group, topicMap).map(_._2)
+    val words = lines.flatMap(_.split(" "))
+    val wordCounts = words.map(x => (x, 1L))
+      .reduceByKeyAndWindow(_ + _, _ - _, Minutes(10), Seconds(2), 2)
+    wordCounts.print()
+
+    ssc.start()
+    ssc.awaitTermination()
+  }
+}
