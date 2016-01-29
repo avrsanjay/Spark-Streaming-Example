@@ -55,7 +55,7 @@ object TestConsumer1{
               "Message "+i+":[{Date:"+Date+"},{Time:"+Time+"},{Type:"+Type+"},{Agent:"+Agent+"},{quantity:"+quantityF+"},{Cost:"+Cost+"},{Name:"+Name+"},{rowId:"+rowId+"}]"
          }
     })        
-
+    Json.saveAsTextFiles("/user/spark/output", "dir")    
     ssc.start()
     ssc.awaitTermination()
   }
