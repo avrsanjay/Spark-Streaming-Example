@@ -1,31 +1,12 @@
+import scala.math.BigInt
+import java.nio.ByteBuffer
+import org.apache.hadoop.hbase.util.Bytes
+
+
 object testplay {
-val person_json = """{"Date": "12/15/15",
-  "Time": "2:08:36",
-  "Type": "Prospect",
-  "Agent": "Dieter Lott",
-  "quantity": 185.98,
-  "Cost": "$174.72",
-  "Name": "Vance Parsons",
-  "rowId": 7448024 }"""                           //> person_json  : String = {"Date": "12/15/15",
-                                                  //|   "Time": "2:08:36",
-                                                  //|   "Type": "Prospect",
-                                                  //|   "Agent": "Dieter Lott",
-                                                  //|   "quantity": 185.98,
-                                                  //|   "Cost": "$174.72",
-                                                  //|   "Name": "Vance Parsons",
-                                                  //|   "rowId": 7448024 }
-
-val person = scala.util.parsing.json.JSON.parseFull(person_json)
-                                                  //> person  : Option[Any] = Some(Map(quantity -> 185.98, Name -> Vance Parsons, 
-                                                  //| Agent -> Dieter Lott, Date -> 12/15/15, Cost -> $174.72, rowId -> 7448024.0,
-                                                  //|  Time -> 2:08:36, Type -> Prospect))
-
-// returns "Joe Doe"
-person match {
-  case Some(m: Map[String, Any]) => m("quantity") match {
-    //case s: String => s
-    case d: Double => d
-    //case i: Int => i
-  }
-}                                                 //> res0: Double = 185.98
+	val s = "$114.85".toString()              //> s  : String = $114.85
+	val r = s.replace('$', ' ').replace('\"', ' ').trim()
+                                                  //> r  : String = 114.85
+	val q = r.toDouble                        //> q  : Double = 114.85
+	
 }

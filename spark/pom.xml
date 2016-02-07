@@ -35,18 +35,13 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.json4s</groupId>
-			<artifactId>json4s-jackson_2.10</artifactId>
-			<version>3.2.10</version>
+			<artifactId>json4s-native_2.10</artifactId>
+			<version>3.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.specs2</groupId>
 			<artifactId>specs2_2.10</artifactId>
 			<version>2.1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>io.argonaut</groupId>
-			<artifactId>argonaut_2.10</artifactId>
-			<version>6.0-M4</version>
 		</dependency>
 		<dependency>
 			<groupId>jdk.tools</groupId>
@@ -59,11 +54,6 @@
 			<groupId>it.nerdammer.bigdata</groupId>
 			<artifactId>spark-hbase-connector_2.10</artifactId>
 			<version>1.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-sql_2.10</artifactId>
-			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
