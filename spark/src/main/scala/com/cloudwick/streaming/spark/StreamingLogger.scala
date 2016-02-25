@@ -3,7 +3,7 @@ package com.cloudwick.streaming.spark
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.Logging
 
-/** Utility functions for Spark Streaming examples. */
+/** Utility functions for Spark Streaming examples */
 object StreamingExamples extends Logging {
 
 	/** Set reasonable logging levels for streaming if the user has not configured log4j. */
